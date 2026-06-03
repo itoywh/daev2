@@ -1,0 +1,29 @@
+#!/bin/sh
+# DAE RPC helper for LuCI JS interface
+
+. /usr/share/libubox/jshn.sh
+
+case "$1" in
+	list)
+		echo '{ "get_status": {}, "reload": {} }'
+	;;
+	call)
+		case "$2" in
+			get_status)
+				json_init
+				if pgrep -x /usr/bin/dae > /dev/null 2>&1; then
+					json_add_boolean "running" 1
+				else
+					json_add_boolean "running" 0
+				fi
+				json_dump
+			;;
+			reload)
+				/etc/init.d/dae reload > /dev/null 2>&1
+				json_init
+				json_add_boolean "result" 1
+				json_dump
+			;;
+		esac
+	;;
+esac
